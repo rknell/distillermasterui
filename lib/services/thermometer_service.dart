@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:collection/collection.dart';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get_it/get_it.dart';
 
@@ -13,7 +13,7 @@ class ThermometerService extends ChangeNotifier {
   List<Thermometer> get data => _thermometers;
 
   ThermometerService() {
-    Timer.periodic(Duration(seconds: 1), (timer) async {
+    Timer.periodic(Duration(seconds: 5), (timer) async {
       final List<TemperatureReading> readings =
           await OneWireTempService.readTemperatures();
       for (final reading in readings) {
@@ -21,13 +21,13 @@ class ThermometerService extends ChangeNotifier {
             .firstWhereOrNull((thermometer) => thermometer.uuid == reading.id);
         if (thermometer == null) {
           _thermometers.add(Thermometer(uuid: reading.id));
+          notifyListeners();
         }
         _thermometers
             .firstWhere((thermometer) => thermometer.uuid == reading.id)
             .addReading(ThermometerReading(
                 uuid: reading.id, temperature: reading.temp ?? 0));
       }
-      notifyListeners();
     });
   }
 }
