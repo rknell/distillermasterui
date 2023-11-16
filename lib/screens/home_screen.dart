@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 import '../services/thermometer_service.dart';
+import 'thermometer_detail.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -37,7 +38,19 @@ class _HomeScreenState extends State<HomeScreen> {
                       return IntrinsicHeight(
                         child: Column(
                           children: [
-                            Text(thermometer.name ?? thermometer.uuid),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => ThermometerDetail(
+                                          thermometer: thermometer,
+                                        )));
+                              },
+                              child: Text(
+                                thermometer.name ?? thermometer.uuid,
+                                style: TextStyle(
+                                    fontSize: 28, fontWeight: FontWeight.bold),
+                              ),
+                            ),
                             Container(
                               height: 300,
                               child: ChangeNotifierBuilder(

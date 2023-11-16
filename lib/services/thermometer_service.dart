@@ -1,8 +1,9 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:collection/collection.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 
 import '../classes/thermometer.dart';
@@ -32,9 +33,46 @@ class ThermometerService extends ChangeNotifier {
   }
 }
 
+class DummyThermometerService extends ThermometerService {
+  final _random = Random();
+
+  @override
+  DummyThermometerService() {
+    Timer.periodic(const Duration(seconds: 5), (timer) async {
+      for (final thermometer in _thermometers) {
+        var lastReading =
+            ThermometerReading(uuid: thermometer.uuid, temperature: 20.0);
+        if (thermometer.data.isNotEmpty) {
+          lastReading = thermometer.data.last;
+        }
+        final newTemperature =
+            lastReading.temperature + _random.nextDouble() * 2 - 1;
+        thermometer.addReading(ThermometerReading(
+            uuid: thermometer.uuid, temperature: newTemperature));
+      }
+      notifyListeners();
+    });
+  }
+
+  @override
+  final List<Thermometer> _thermometers = [
+    Thermometer(uuid: '28.12345678'),
+    Thermometer(uuid: '28.3456789'),
+    Thermometer(uuid: '28.987654'),
+  ];
+
+  @override
+  List<Thermometer> get data => _thermometers;
+}
+
 ThermometerService get thermometerService {
   if (GetIt.instance.isRegistered<ThermometerService>() == false) {
-    GetIt.instance.registerSingleton(ThermometerService());
+    if (kDebugMode) {
+      GetIt.instance
+          .registerSingleton<ThermometerService>(DummyThermometerService());
+    } else {
+      GetIt.instance.registerSingleton(ThermometerService());
+    }
   }
   return GetIt.instance.get<ThermometerService>();
 }
