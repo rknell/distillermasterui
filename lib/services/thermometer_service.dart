@@ -17,6 +17,8 @@ class ThermometerService extends ChangeNotifier {
     Timer.periodic(Duration(seconds: 5), (timer) async {
       final List<TemperatureReading> readings =
           await OneWireTempService.readTemperatures();
+      readings
+          .removeWhere((element) => element.temp == 0 || element.temp == null);
       for (final reading in readings) {
         final thermometer = _thermometers
             .firstWhereOrNull((thermometer) => thermometer.uuid == reading.id);
