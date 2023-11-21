@@ -22,6 +22,8 @@ class Thermometer extends ChangeNotifier {
 
   final File _file = File('thermometer_settings.json');
 
+  bool get isAlarming => alarms.any((element) => element.isTriggered == true);
+
   Thermometer(
       {required this.uuid,
       this.name,

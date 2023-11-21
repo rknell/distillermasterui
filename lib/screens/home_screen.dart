@@ -63,10 +63,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 fontWeight: FontWeight.bold),
                                           ),
                                         ),
-                                        Container(
+                                        AnimatedContainer(
+                                          duration: Duration(milliseconds: 500),
+                                          color: thermometer.isAlarming
+                                              ? Colors.red
+                                              : Colors.transparent,
                                           height: 300,
                                           child: LineChart(
-                                            duration: Duration.zero,
                                             LineChartData(
                                                 titlesData: FlTitlesData(
                                                     bottomTitles: AxisTitles(

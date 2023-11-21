@@ -1,7 +1,7 @@
 import 'dart:math';
 
 class TempToABV {
-  static final List<double> temperatures = [
+  static final List<double> abv = [
     0,
     2.483,
     5.464,
@@ -31,7 +31,7 @@ class TempToABV {
     100
   ];
 
-  static final List<double> liquidABV = [
+  static final List<double> liquidTemp = [
     99.9373,
     98.0543,
     95.7947,
@@ -61,7 +61,7 @@ class TempToABV {
     77.8172
   ];
 
-  static final List<double> vaporABV = [
+  static final List<double> vaporTemp = [
     100.04,
     99.7712,
     99.4513,
@@ -114,10 +114,10 @@ class TempToABV {
   }
 
   static double getLiquidABV(double temperature) {
-    return interpolate(temperature, temperatures, liquidABV);
+    return interpolate(temperature, liquidTemp, abv);
   }
 
   static double getVaporABV(double temperature) {
-    return interpolate(temperature, temperatures, vaporABV);
+    return interpolate(temperature, vaporTemp, abv);
   }
 }
