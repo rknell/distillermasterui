@@ -30,145 +30,153 @@ class _ThermometerDetailState extends State<ThermometerDetail> {
       appBar: AppBar(
         title: Text('Thermometer Detail'),
       ),
-      body: Center(
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                child: TextFormField(
-                  initialValue: _name,
-                  decoration: InputDecoration(
-                    labelText: 'Name',
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter a name';
-                    }
-                    return null;
-                  },
-                  onSaved: (value) {
-                    if (value != null) {
-                      setState(() {
-                        _name = value;
-                      });
-                      widget.thermometer.setName(value);
-                    }
-                  },
-                ),
-              ),
-              SizedBox(height: 20),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                child: DropdownButtonFormField<ThermometerType>(
-                  value: _type,
-                  decoration: InputDecoration(
-                    labelText: 'Type',
-                  ),
-                  items: ThermometerType.values
-                      .map<DropdownMenuItem<ThermometerType>>(
-                          (ThermometerType value) {
-                    return DropdownMenuItem<ThermometerType>(
-                      value: value,
-                      child: Text(value.toString().split('.').last),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _type = value!;
-                    });
-                    widget.thermometer.setType(value!);
-                  },
-                ),
-              ),
-              SizedBox(height: 20),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      _formKey.currentState!.save();
-                      widget.thermometer.save();
-                      Navigator.pop(context);
-                    }
-                  },
-                  child: Text('Save'),
-                ),
-              ),
-              SizedBox(height: 20),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: widget.thermometer.alarms.length,
-                  itemBuilder: (context, index) {
-                    final alarm = widget.thermometer.alarms.elementAt(index);
-                    return ChangeNotifierBuilder(
-                        notifier: alarm,
-                        builder: (context) {
-                          return Card(
-                            child: ListTile(
-                              title: Text(
-                                'Min: ${alarm.minTemp}, Max: ${alarm.maxTemp}',
-                                style: TextStyle(
-                                  color: alarm.isTriggered ? Colors.red : null,
-                                ),
-                              ),
-                              subtitle: alarm.isTriggered
-                                  ? Text(
-                                      'Alarm Triggered',
-                                      style: TextStyle(
-                                        color: Colors.red,
-                                      ),
-                                    )
-                                  : null,
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    icon: Icon(Icons.edit),
-                                    onPressed: () {
-                                      editAlarm(alarm);
-                                    },
-                                  ),
-                                  IconButton(
-                                    icon: Icon(Icons.delete),
-                                    onPressed: () {
-                                      setState(() {
-                                        widget.thermometer.removeAlarm(alarm);
-                                      });
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ),
+      body: ChangeNotifierBuilder(
+          notifier: widget.thermometer,
+          builder: (context) {
+            return Center(
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      child: TextFormField(
+                        initialValue: _name,
+                        decoration: InputDecoration(
+                          labelText: 'Name',
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter a name';
+                          }
+                          return null;
+                        },
+                        onSaved: (value) {
+                          if (value != null) {
+                            setState(() {
+                              _name = value;
+                            });
+                            widget.thermometer.setName(value);
+                          }
+                        },
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      child: DropdownButtonFormField<ThermometerType>(
+                        value: _type,
+                        decoration: InputDecoration(
+                          labelText: 'Type',
+                        ),
+                        items: ThermometerType.values
+                            .map<DropdownMenuItem<ThermometerType>>(
+                                (ThermometerType value) {
+                          return DropdownMenuItem<ThermometerType>(
+                            value: value,
+                            child: Text(value.toString().split('.').last),
                           );
-                        });
-                  },
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            _type = value!;
+                          });
+                          widget.thermometer.setType(value!);
+                        },
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          if (_formKey.currentState!.validate()) {
+                            _formKey.currentState!.save();
+                            widget.thermometer.save();
+                            Navigator.pop(context);
+                          }
+                        },
+                        child: Text('Save'),
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: widget.thermometer.alarms.length,
+                        itemBuilder: (context, index) {
+                          final alarm =
+                              widget.thermometer.alarms.elementAt(index);
+                          return ChangeNotifierBuilder(
+                              notifier: alarm,
+                              builder: (context) {
+                                return Card(
+                                  child: ListTile(
+                                    title: Text(
+                                      'Min: ${alarm.minTemp}, Max: ${alarm.maxTemp}',
+                                      style: TextStyle(
+                                        color: alarm.isTriggered
+                                            ? Colors.red
+                                            : null,
+                                      ),
+                                    ),
+                                    subtitle: alarm.isTriggered
+                                        ? Text(
+                                            'Alarm Triggered',
+                                            style: TextStyle(
+                                              color: Colors.red,
+                                            ),
+                                          )
+                                        : null,
+                                    trailing: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        IconButton(
+                                          icon: Icon(Icons.edit),
+                                          onPressed: () {
+                                            editAlarm(alarm);
+                                          },
+                                        ),
+                                        IconButton(
+                                          icon: Icon(Icons.delete),
+                                          onPressed: () {
+                                            setState(() {
+                                              widget.thermometer
+                                                  .removeAlarm(alarm);
+                                            });
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              });
+                        },
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            editAlarm(null);
+                          },
+                          child: Text('Add Alarm'),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            widget.thermometer.clearTriggered();
+                          },
+                          child: Text('Clear Triggered'),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-              SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      editAlarm(null);
-                    },
-                    child: Text('Add Alarm'),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      widget.thermometer.clearTriggered();
-                    },
-                    child: Text('Clear Triggered'),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
+            );
+          }),
     );
   }
 
@@ -182,9 +190,6 @@ class _ThermometerDetailState extends State<ThermometerDetail> {
       ),
     );
     widget.thermometer.addAlarm(value);
-    if (value != null && widget.thermometer.alarms.contains(value) == false) {
-      widget.thermometer.alarms.add(value);
-    }
   }
 }
 

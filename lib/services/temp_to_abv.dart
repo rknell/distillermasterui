@@ -113,11 +113,33 @@ class TempToABV {
     return y0 + (temperature - x0) * (y1 - y0) / (x1 - x0);
   }
 
+  static double interpolateInverse(
+      double temperature, List<double> xValues, List<double> yValues) {
+    if (temperature <= xValues.first) {
+      return yValues.last;
+    }
+    if (temperature >= xValues.last) {
+      return yValues.first;
+    }
+
+    int index = 0;
+    while (temperature > xValues[index]) {
+      index++;
+    }
+
+    double x0 = xValues[index - 1];
+    double x1 = xValues[index];
+    double y0 = yValues[yValues.length - index];
+    double y1 = yValues[yValues.length - index - 1];
+
+    return y0 + (temperature - x0) * (y1 - y0) / (x1 - x0);
+  }
+
   static double getLiquidABV(double temperature) {
-    return interpolate(temperature, liquidTemp, abv);
+    return interpolateInverse(temperature, liquidTemp, abv);
   }
 
   static double getVaporABV(double temperature) {
-    return interpolate(temperature, vaporTemp, abv);
+    return interpolateInverse(temperature, vaporTemp, abv);
   }
 }
