@@ -4,7 +4,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 
+import 'alarm.dart';
+
 part 'thermometer.g.dart';
+
+enum ThermometerType { Column, Deflegmator, Boiler, Condensor, Plate, Other }
 
 @JsonSerializable(explicitToJson: true)
 class Thermometer extends ChangeNotifier {
@@ -14,6 +18,7 @@ class Thermometer extends ChangeNotifier {
   ThermometerType type;
 
   List<ThermometerReading> data;
+  Set<Alarm> alarms; // Changed type to Set<Alarm>
 
   final File _file = File('thermometer_settings.json');
 
@@ -21,9 +26,11 @@ class Thermometer extends ChangeNotifier {
       {required this.uuid,
       this.name,
       ThermometerType? type,
-      List<ThermometerReading>? data})
+      List<ThermometerReading>? data,
+      Set<Alarm>? alarms}) // Initialize alarms set in the constructor
       : data = data ?? <ThermometerReading>[],
-        type = type ?? ThermometerType.Other {
+        type = type ?? ThermometerType.Other,
+        alarms = alarms ?? <Alarm>{}.toSet() {
     if (name != null) {
       save();
     }
@@ -45,6 +52,17 @@ class Thermometer extends ChangeNotifier {
       data.removeAt(0);
     }
     data.add(reading);
+
+    // Iterate over alarms and check if any conditions are met
+    for (final alarm in alarms) {
+      alarm.checkTemperature(reading.temperature);
+    }
+
+    notifyListeners();
+  }
+
+  void clearTriggered() {
+    alarms.removeWhere((element) => element.isTriggered == true);
     notifyListeners();
   }
 
@@ -74,6 +92,18 @@ class Thermometer extends ChangeNotifier {
   Map<String, dynamic> toJson() => _$ThermometerToJson(this);
 
   Thermometer fromJson(Map<String, dynamic> json) => Thermometer.fromJson(json);
+
+  void addAlarm(Alarm? alarm) {
+    if (alarm != null) {
+      alarms.add(alarm);
+      notifyListeners();
+    }
+  }
+
+  void removeAlarm(alarm) {
+    alarms.remove(alarm);
+    notifyListeners();
+  }
 }
 
 @JsonSerializable(explicitToJson: true)
@@ -94,5 +124,3 @@ class ThermometerReading {
   ThermometerReading fromJson(Map<String, dynamic> json) =>
       ThermometerReading.fromJson(json);
 }
-
-enum ThermometerType { Column, Deflegmator, Boiler, Condensor, Plate, Other }
