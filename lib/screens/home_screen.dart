@@ -37,99 +37,95 @@ class _HomeScreenState extends State<HomeScreen> {
                     itemBuilder: (context, index) {
                       final thermometer =
                           thermometerServiceInstance.data[index];
-                      return IntrinsicHeight(
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Column(
+                      return ChangeNotifierBuilder(
+                          notifier: thermometer,
+                          builder: (context) {
+                            return IntrinsicHeight(
+                              child: Row(
                                 children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      Navigator.of(context).push(
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  ThermometerDetail(
-                                                    thermometer: thermometer,
-                                                  )));
-                                    },
-                                    child: Text(
-                                      "${thermometer.name ?? thermometer.uuid} - ${thermometer.data.last.temperature.toStringAsFixed(2)}",
-                                      style: TextStyle(
-                                          fontSize: 28,
-                                          fontWeight: FontWeight.bold),
+                                  Expanded(
+                                    child: Column(
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () {
+                                            Navigator.of(context).push(
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        ThermometerDetail(
+                                                          thermometer:
+                                                              thermometer,
+                                                        )));
+                                          },
+                                          child: Text(
+                                            "${thermometer.name ?? thermometer.uuid} - ${thermometer.data.last.temperature.toStringAsFixed(2)}",
+                                            style: TextStyle(
+                                                fontSize: 28,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        Container(
+                                          height: 300,
+                                          child: LineChart(
+                                            duration: Duration.zero,
+                                            LineChartData(
+                                                titlesData: FlTitlesData(
+                                                    bottomTitles: AxisTitles(
+                                                        sideTitles: SideTitles(
+                                                      reservedSize: 100,
+                                                      interval: 20,
+                                                      showTitles: true,
+                                                      // getTitlesWidget: (value, meta) {
+                                                      //   return Text(value.toString());
+                                                      // },
+                                                    )),
+                                                    topTitles: AxisTitles(
+                                                        sideTitles: SideTitles(
+                                                            showTitles: false)),
+                                                    leftTitles: AxisTitles(
+                                                        sideTitles: SideTitles(
+                                                            showTitles:
+                                                                false))),
+                                                borderData:
+                                                    FlBorderData(show: false),
+                                                lineBarsData: [
+                                                  LineChartBarData(
+                                                    spots: thermometer.data
+                                                        .map((e) => FlSpot(
+                                                            e.timestamp
+                                                                .difference(
+                                                                    DateTime
+                                                                        .now())
+                                                                .inSeconds
+                                                                .toDouble(),
+                                                            e.temperature))
+                                                        .toList(),
+                                                  )
+                                                ]),
+                                          ),
+                                        )
+                                      ],
                                     ),
                                   ),
-                                  Container(
-                                    height: 300,
-                                    child: ChangeNotifierBuilder(
-                                      builder: (context) {
-                                        return LineChart(
-                                          duration: Duration.zero,
-                                          LineChartData(
-                                              titlesData: FlTitlesData(
-                                                  bottomTitles: AxisTitles(
-                                                      sideTitles: SideTitles(
-                                                    reservedSize: 100,
-                                                    interval: 20,
-                                                    showTitles: true,
-                                                    // getTitlesWidget: (value, meta) {
-                                                    //   return Text(value.toString());
-                                                    // },
-                                                  )),
-                                                  topTitles: AxisTitles(
-                                                      sideTitles: SideTitles(
-                                                          showTitles: false)),
-                                                  leftTitles: AxisTitles(
-                                                      sideTitles: SideTitles(
-                                                          showTitles: false))),
-                                              borderData:
-                                                  FlBorderData(show: false),
-                                              lineBarsData: [
-                                                LineChartBarData(
-                                                  spots: thermometer.data
-                                                      .map((e) => FlSpot(
-                                                          e.timestamp
-                                                              .difference(
-                                                                  DateTime
-                                                                      .now())
-                                                              .inSeconds
-                                                              .toDouble(),
-                                                          e.temperature))
-                                                      .toList(),
-                                                )
-                                              ]),
-                                        );
-                                      },
-                                      notifier: thermometer,
-                                    ),
+                                  Column(
+                                    children: [
+                                      if ((thermometer.type ==
+                                                  ThermometerType.Column ||
+                                              thermometer.type ==
+                                                  ThermometerType.Boiler) &&
+                                          thermometer.data.isNotEmpty)
+                                        InfoBox(
+                                            temperature: thermometer
+                                                .data.last.temperature),
+                                    ],
                                   )
                                 ],
                               ),
-                            ),
-                            Column(
-                              children: [
-                                if ((thermometer.type ==
-                                            ThermometerType.Column ||
-                                        thermometer.type ==
-                                            ThermometerType.Boiler) &&
-                                    thermometer.data.isNotEmpty)
-                                  ChangeNotifierBuilder(
-                                      notifier: thermometer,
-                                      builder: (context) {
-                                        return InfoBox(
-                                            temperature: thermometer
-                                                .data.last.temperature);
-                                      }),
-                              ],
-                            )
-                          ],
-                        ),
-                      );
+                            );
+                          });
                     },
                   );
                 }),
           ),
-          Text("Test")
         ],
       ),
     );
