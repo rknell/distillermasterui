@@ -48,6 +48,9 @@ class Thermometer extends ChangeNotifier {
   }
 
   void addReading(ThermometerReading reading) {
+    if (reading.temperature == 0) {
+      return;
+    }
     if (data.length > 60) {
       data.removeAt(0);
     }
